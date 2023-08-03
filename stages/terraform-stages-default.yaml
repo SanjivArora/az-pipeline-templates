@@ -23,7 +23,7 @@ stages:
       - job: plan 
         displayName: Plan
         steps:
-          - template: terraform-task-plan.yaml
+          - template: tasks/terraform-task-plan.yaml
           paramaters:
             workingDirectory: '${{ parameters.workingDirectory }}'
             adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
@@ -40,7 +40,7 @@ stages:
       - job: ScanningCodes
         displayName: 'Run Checkov'
         steps:
-          - template: terraform-task-compliance.yaml
+          - template: tasks/terraform-task-compliance.yaml
           paramaters:
             workingDirectory: '${{ parameters.workingDirectory }}'
 
@@ -55,7 +55,7 @@ stages:
       - deployment: apply
         environment: ${{ parameters.Env }}
         steps:
-          - template: terraform-task-apply.yaml
+          - template: tasks/terraform-task-apply.yaml
           parameters:
             workingDirectory: '${{ parameters.workingDirectory }}'
             adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
