@@ -1,0 +1,89 @@
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: adoServiceConnectionName
+    type: string
+  - name: backendAzureRmResourceGroupName
+    type: string
+  - name: backendAzureRmStorageAccountName
+    type: string
+  - name: backendAzureRmContainerName
+    type: string
+  - name: backendAzureRmKey
+    type: string
+  - name: tfvarsFileName
+    type: string
+
+steps:
+  - script: |
+      git config --global url.https://$(System.AccessToken)@dev.azure.com.insteadOf "https://dev.azure.com"
+    displayName: 'Set git config'
+  - task: TerraformInstaller@0
+    displayName: 'Terraform Install'
+    inputs:
+      terraformVersion: '$(terraform_version)'
+  - task: TerraformTaskV4@4
+    displayName: 'Terraform Init'
+    inputs:
+      provider: 'azurerm'
+      workingDirectory: '${{ parameters.workingDirectory }}'
+      command: init
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}"'
+      backendServiceArm: '${{ parameters.adoServiceConnectionName }}'
+      backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+      backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+      backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+      backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+  - task: TerraformTaskV4@4
+    displayName: 'Terraform Validate'
+    inputs:
+      provider: 'azurerm'
+      workingDirectory: '${{ parameters.workingDirectory }}'
+      command: validate
+      backendServiceArm: '${{ parameters.adoServiceConnectionName }}'
+      backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+      backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+      backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+      backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+  - task: TerraformTaskV4@4
+    displayName: Terraform Plan
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}"'
+      workingDirectory: '${{ parameters.workingDirectory }}'
+      commandOptions: '-out $(Build.BuildId).tfplan'
+      backendServiceArm: '${{ parameters.adoServiceConnectionName }}'
+      backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+      backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+      backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+      backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+  - task: ArchiveFiles@2
+    displayName: 'Archive Terraform Plan Files'
+    inputs:
+      rootFolderOrFile: '${{ parameters.workingDirectory }}'
+      includeRootFolder: false
+      archiveType: 'tar'
+      tarCompression: 'gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-tfplan.tgz'
+      replaceExistingArchive: true     
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Terraform Plan Artifact'
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)'
+      artifactName: '$(Build.BuildId)-tfplan'
+      artifactType: pipeline
+  - script: |
+      cd $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
+      ls -l
+      terraform show -json $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}/$(Build.BuildId).tfplan > tf.json
+    displayName: 'Terraform Show'
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Terraform Show Artifact'
+    inputs:
+      targetPath: '${{ parameters.workingDirectory }}/tf.json'
+      artifactName: 'tfshow'
+      artifactType: pipeline
+  - script: |
+      git config --global --unset url.https://$(System.AccessToken)@dev.azure.com.insteadOf
+    displayName: 'Unset git config'

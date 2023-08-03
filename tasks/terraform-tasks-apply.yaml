@@ -1,0 +1,51 @@
+parameters:
+  - name: workingDirectory
+    type: string
+  - name: adoServiceConnectionName
+    type: string
+  - name: backendAzureRmResourceGroupName
+    type: string
+  - name: backendAzureRmStorageAccountName
+    type: string
+  - name: backendAzureRmContainerName
+    type: string
+  - name: backendAzureRmKey
+    type: string
+  - name: tfvarsFileName
+    type: string
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download JSON Artifact'
+    inputs:
+      source: current 
+      artifactName: '$(Build.BuildId)-tfplan'
+      downloadPath: $(System.DefaultWorkingDirectory)/Artifact
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'Artifact/*.tgz' 
+      destinationFolder:  '${{ parameters.workingDirectory }}'
+      overwriteExistingFiles: true
+  - task: TerraformInstaller@0
+    displayName: 'Terraform Install'
+    inputs:
+      terraformVersion: '$(terraform_version)'
+  - task: TerraformTaskV4@4
+    displayName: 'Terraform Init'
+    inputs:
+      provider: 'azurerm'
+      workingDirectory: '${{ parameters.workingDirectory }}'
+      command: init
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}"'
+      backendServiceArm: '${{ parameters.adoServiceConnectionName }}'
+      backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+      backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+      backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+      backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+  - task: TerraformTaskV2@2
+    displayName: 'Terraform Apply'
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      workingDirectory: '${{ parameters.workingDirectory }}'
+      environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'

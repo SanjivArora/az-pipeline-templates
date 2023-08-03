@@ -1,0 +1,66 @@
+parameters:
+- name: Env
+  type: string
+- name: workingDirectory
+  type: string
+- name: adoServiceConnectionName
+  type: string
+- name: backendAzureRmResourceGroupName
+  type: string
+- name: backendAzureRmStorageAccountName
+  type: string
+- name: backendAzureRmContainerName
+  type: string
+- name: backendAzureRmKey
+  type: string
+- name: tfvarsFileName
+  type: string
+
+stages:
+  - stage: plan
+    displayName: "Plan and Generate Artifact"
+    jobs:
+      - job: plan 
+        displayName: Plan
+        steps:
+          - template: terraform-task-plan.yaml
+          paramaters:
+            workingDirectory: '${{ parameters.workingDirectory }}'
+            adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
+            backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+            backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+            backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+            backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+            tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+
+  - stage: compliance
+    dependsOn: plan
+    displayName: 'Static Code Analysis Stage'
+    jobs:
+      - job: ScanningCodes
+        displayName: 'Run Checkov'
+        steps:
+          - template: terraform-task-compliance.yaml
+          paramaters:
+            workingDirectory: '${{ parameters.workingDirectory }}'
+
+  - stage: deploy
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    dependsOn: 
+      - plan
+      - compliance
+      - approval
+    displayName: Deploy
+    jobs:
+      - deployment: apply
+        environment: ${{ parameters.Env }}
+        steps:
+          - template: terraform-task-apply.yaml
+          parameters:
+            workingDirectory: '${{ parameters.workingDirectory }}'
+            adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
+            backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+            backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+            backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+            backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+            tfvarsFileName: '${{ parameters.tfvarsFileName }}'

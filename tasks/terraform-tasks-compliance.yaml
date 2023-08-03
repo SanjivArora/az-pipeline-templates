@@ -1,0 +1,27 @@
+parameters:
+  - name: workingDirectory
+    type: string
+
+steps:
+- task: DownloadPipelineArtifact@2
+  displayName: 'Download JSON Artifact'
+  inputs:
+    source: current 
+    artifactName: 'tfshow'
+    downloadPath: $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
+- script: |
+          mkdir CheckovReport
+          docker pull bridgecrew/checkov
+          docker run --volume $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}:/tf --workdir /tf bridgecrew/checkov --download-external-modules true --framework terraform_plan --check MEDIUM --file tf/tf.json --output junitxml > $(System.DefaultWorkingDirectory)/CheckovReport/Checkov-Report.xml
+  displayName: 'Do Checkov Static Code Analysis'
+- task: PublishTestResults@2
+  displayName: Publish Checkov Test Results
+  condition: succeededOrFailed()
+  inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/Checkov-Report.xml'
+      searchFolder: '$(System.DefaultWorkingDirectory)/CheckovReport'
+      mergeTestResults: false
+      testRunTitle: Checkov Scan
+      failTaskOnFailedTests: false
+      publishRunAttachments: true
