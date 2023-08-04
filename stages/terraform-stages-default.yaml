@@ -1,5 +1,5 @@
 parameters:
-- name: Env
+- name: env
   type: string
 - name: workingDirectory
   type: string
@@ -44,23 +44,24 @@ stages:
           paramaters:
             workingDirectory: '${{ parameters.workingDirectory }}'
 
-  - stage: deploy
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    dependsOn: 
-      - plan
-      - compliance
-      - approval
-    displayName: Deploy
-    jobs:
-      - deployment: apply
-        environment: ${{ parameters.Env }}
-        steps:
-          - template: tasks/terraform-task-apply.yaml
-          parameters:
-            workingDirectory: '${{ parameters.workingDirectory }}'
-            adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
-            backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
-            backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
-            backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
-            backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-            tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+###### The deploy stage will be enabled when testing has been done
+  # - stage: deploy
+  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #   dependsOn: 
+  #     - plan
+  #     - compliance
+  #     - approval
+  #   displayName: Deploy
+  #   jobs:
+  #     - deployment: apply
+  #       environment: $(System.TeamProject)-${{ parameters.env }}
+  #       steps:
+  #         - template: tasks/terraform-task-apply.yaml
+  #         parameters:
+  #           workingDirectory: '${{ parameters.workingDirectory }}'
+  #           adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
+  #           backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+  #           backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+  #           backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+  #           backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+  #           tfvarsFileName: '${{ parameters.tfvarsFileName }}'
