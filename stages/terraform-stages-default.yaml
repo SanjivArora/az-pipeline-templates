@@ -24,7 +24,7 @@ stages:
         displayName: Plan
         steps:
           - template: tasks/terraform-task-plan.yaml
-          paramaters:
+          parameters:
             workingDirectory: '${{ parameters.workingDirectory }}'
             adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
             backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
@@ -41,7 +41,7 @@ stages:
         displayName: 'Run Checkov'
         steps:
           - template: tasks/terraform-task-compliance.yaml
-          paramaters:
+          parameters:
             workingDirectory: '${{ parameters.workingDirectory }}'
 
 ###### The deploy stage will be enabled when testing has been done
