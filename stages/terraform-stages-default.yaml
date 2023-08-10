@@ -23,15 +23,15 @@ stages:
       - job: plan 
         displayName: Plan
         steps:
-          - template: tasks/terraform-task-plan.yaml
-          parameters:
-            workingDirectory: '${{ parameters.workingDirectory }}'
-            adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
-            backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
-            backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
-            backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
-            backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-            tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+          - template: tasks/terraform-tasks-plan.yaml
+            parameters:
+              workingDirectory: '${{ parameters.workingDirectory }}'
+              adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
+              backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+              backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+              backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+              backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+              tfvarsFileName: '${{ parameters.tfvarsFileName }}'
 
   - stage: compliance
     dependsOn: plan
@@ -40,28 +40,29 @@ stages:
       - job: ScanningCodes
         displayName: 'Run Checkov'
         steps:
-          - template: tasks/terraform-task-compliance.yaml
-          parameters:
-            workingDirectory: '${{ parameters.workingDirectory }}'
+          - template: tasks/terraform-tasks-compliance.yaml
+            parameters:
+              workingDirectory: '${{ parameters.workingDirectory }}'
 
-###### The deploy stage will be enabled when testing has been done
-  # - stage: deploy
-  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  #   dependsOn: 
-  #     - plan
-  #     - compliance
-  #     - approval
-  #   displayName: Deploy
-  #   jobs:
-  #     - deployment: apply
-  #       environment: $(System.TeamProject)-${{ parameters.env }}
-  #       steps:
-  #         - template: tasks/terraform-task-apply.yaml
-  #         parameters:
-  #           workingDirectory: '${{ parameters.workingDirectory }}'
-  #           adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
-  #           backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
-  #           backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
-  #           backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
-  #           backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-  #           tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+  - stage: deploy
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    dependsOn: 
+      - plan
+      - compliance
+    displayName: Deploy
+    jobs:
+      - deployment: apply
+        environment: $(System.TeamProject)-${{ parameters.env }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: tasks/terraform-tasks-apply.yaml
+                  parameters:
+                    workingDirectory: '${{ parameters.workingDirectory }}'
+                    adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
+                    backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+                    backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+                    backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+                    backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+                    tfvarsFileName: '${{ parameters.tfvarsFileName }}'

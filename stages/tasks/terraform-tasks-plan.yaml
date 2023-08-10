@@ -50,10 +50,9 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}"'
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -out $(Build.BuildId).tfplan'
       workingDirectory: '${{ parameters.workingDirectory }}'
-      commandOptions: '-out $(Build.BuildId).tfplan'
-      backendServiceArm: '${{ parameters.adoServiceConnectionName }}'
+      environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'
       backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
       backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
       backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
