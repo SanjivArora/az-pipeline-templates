@@ -16,6 +16,15 @@ parameters:
 - name: tfvarsFileName
   type: string
 
+# stages:
+#   - stage: unlock
+#     displayName: "Unlock Keyvault and Storage Accounts"
+#     jobs:
+#       - job: Unlock 
+#         displayName: Unlock
+#         steps:
+#           - template: tasks/terraform-tasks-unlock.yaml
+
 stages:
   - stage: plan
     displayName: "Plan and Generate Artifact"
@@ -66,3 +75,20 @@ stages:
                     backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
                     backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
                     tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+
+stages:
+  - stage: lock
+    displayName: "Lock Keyvault and Storage Accounts"
+    jobs:
+      - job: plan 
+        displayName: Plan
+        steps:
+          - template: tasks/terraform-tasks-plan.yaml
+            parameters:
+              workingDirectory: '${{ parameters.workingDirectory }}'
+              adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
+              backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
+              backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
+              backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
+              backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+              tfvarsFileName: '${{ parameters.tfvarsFileName }}'

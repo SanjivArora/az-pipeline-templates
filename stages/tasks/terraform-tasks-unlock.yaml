@@ -1,0 +1,13 @@
+steps:
+  - task: AzureCLI@2
+    displayName: 'Terraform Install'
+    inputs:
+      azureSubscription: 'Your-Azure-Service-Connection-Name'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        keyvaults_array=($(echo $(terraform_keyvault_names) | tr "," "\n"))
+        for keyvault in "${keyvaults_array[@]}"
+        do
+          az keyvault update --name $keyvault --resource-group <Your-Resource-Group> --default-action Allow
+        done
