@@ -76,19 +76,11 @@ stages:
                     backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
                     tfvarsFileName: '${{ parameters.tfvarsFileName }}'
 
-stages:
-  - stage: lock
-    displayName: "Lock Keyvault and Storage Accounts"
-    jobs:
-      - job: plan 
-        displayName: Plan
-        steps:
-          - template: tasks/terraform-tasks-plan.yaml
-            parameters:
-              workingDirectory: '${{ parameters.workingDirectory }}'
-              adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
-              backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
-              backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
-              backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
-              backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-              tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+# stages:
+#   - stage: lock
+#     displayName: "Lock Keyvault and Storage Accounts"
+#     jobs:
+#       - job: lock 
+#         displayName: lock
+#         steps:
+#           - template: tasks/terraform-tasks-lock.yaml
