@@ -78,7 +78,6 @@ stages:
                     backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
                     tfvarsFileName: '${{ parameters.tfvarsFileName }}'
 
-stages:
   - stage: lock
     displayName: "Lock Keyvault and Storage Accounts"
     jobs:
