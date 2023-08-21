@@ -1,0 +1,23 @@
+parameters:
+- name: env
+  type: string
+- name: networkZone
+  type: string
+
+steps:
+  - task: AzureCLI@2
+    displayName: 'Update Key Vaults Default Action'
+    inputs:
+      azureSubscription: 'Your-Azure-Service-Connection-Name'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        RESOURCE_GROUP="${{ parameters.env }}-iaas-${{ parameters.env }}-common-ae-1"
+
+        # Get all the Key Vault names in the specified Resource Group
+        keyvaults_array=($(az keyvault list --resource-group $RESOURCE_GROUP --query "[].name" -o tsv))
+
+        for keyvault in "${keyvaults_array[@]}"
+        do
+          az keyvault update --name $keyvault --resource-group $RESOURCE_GROUP --default-action Deny
+        done
