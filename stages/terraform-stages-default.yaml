@@ -88,3 +88,4 @@ stages:
             parameters:
               env: '${{ parameters.env }}'
               networkZone: '${{ parameters.networkZone }}'
+              adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'

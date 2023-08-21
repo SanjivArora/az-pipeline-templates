@@ -3,12 +3,14 @@ parameters:
   type: string
 - name: networkZone
   type: string
+- name: adoServiceConnectionName
+  type: string
 
 steps:
   - task: AzureCLI@2
     displayName: 'Update Key Vaults Default Action'
     inputs:
-      azureSubscription: 'Your-Azure-Service-Connection-Name'
+      azureSubscription: '${{ parameters.adoServiceConnectionName }}'
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
