@@ -1,4 +1,6 @@
 parameters:
+- name: compliance
+  type: string
 - name: env
   type: string
 - name: workingDirectory
@@ -45,6 +47,7 @@ stages:
               tfvarsFileName: '${{ parameters.tfvarsFileName }}'
 
   - stage: compliance
+    condition: ne('${{ parameters.compliance }}', 'disabled')
     dependsOn: plan
     displayName: 'Static Code Analysis Stage'
     jobs:
