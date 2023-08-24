@@ -3,8 +3,8 @@ parameters:
     type: string
   - name: skipCheck
     type: string
-    Default: 'disabled'
-    
+    default: 'disabled'
+
 steps:
 - task: DownloadPipelineArtifact@2
   displayName: 'Download JSON Artifact'
