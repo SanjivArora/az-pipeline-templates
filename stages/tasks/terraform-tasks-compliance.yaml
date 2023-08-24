@@ -1,7 +1,10 @@
 parameters:
   - name: workingDirectory
     type: string
-
+  - name: skipCheck
+    type: string
+    Default: 'disabled'
+    
 steps:
 - task: DownloadPipelineArtifact@2
   displayName: 'Download JSON Artifact'
@@ -12,7 +15,11 @@ steps:
 - script: |
           mkdir CheckovReport
           docker pull bridgecrew/checkov
-          docker run --volume $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}:/tf --workdir /tf bridgecrew/checkov --download-external-modules true --framework terraform_plan --check MEDIUM --file tf/tf.json --output junitxml > $(System.DefaultWorkingDirectory)/CheckovReport/Checkov-Report.xml
+          SKIP_CHECK_OPTION=""
+          if [ "${{ parameters.skipCheck }}" == "enabled" ]; then
+            SKIP_CHECK_OPTION="--skip-check CKV_AZURE_183,CKV2_AZURE_31"
+          fi
+          docker run --volume $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}:/tf --workdir /tf bridgecrew/checkov --download-external-modules true $SKIP_CHECK_OPTION --framework terraform_plan --check MEDIUM --file tf/tf.json --output junitxml > $(System.DefaultWorkingDirectory)/CheckovReport/Checkov-Report.xml
   displayName: 'Do Checkov Static Code Analysis'
 - task: PublishTestResults@2
   displayName: Publish Checkov Test Results
