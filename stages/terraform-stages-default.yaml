@@ -1,6 +1,7 @@
 parameters:
 - name: compliance
   type: string
+  default: 'enabled'  
 - name: env
   type: string
 - name: workingDirectory
