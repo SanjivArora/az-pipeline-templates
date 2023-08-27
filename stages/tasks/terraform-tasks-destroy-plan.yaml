@@ -65,7 +65,13 @@ steps:
       archiveType: 'tar'
       tarCompression: 'gz'
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-tfplan.tgz'
-      replaceExistingArchive: true     
+      replaceExistingArchive: true
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Terraform Plan Artifact'
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)'
+      artifactName: '$(Build.BuildId)-tfplan'
+      artifactType: pipeline    
   - script: |
       cd $(System.DefaultWorkingDirectory)/${{ parameters.workingDirectory }}
       ls -l
