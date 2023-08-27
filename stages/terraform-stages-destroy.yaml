@@ -22,13 +22,13 @@ parameters:
   type: string
 
 stages:
-  - stage: plan
+  - stage: plan-destroy
     displayName: "Plan and Generate Artifact"
     jobs:
-      - job: plan 
-        displayName: Plan
+      - job: plan-destroy 
+        displayName: Plan-destroy
         steps:
-          - template: tasks/terraform-tasks-plan.yaml
+          - template: tasks/terraform-tasks-destroy-plan.yaml
             parameters:
               workingDirectory: '${{ parameters.workingDirectory }}'
               adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
@@ -38,32 +38,19 @@ stages:
               backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
               tfvarsFileName: '${{ parameters.tfvarsFileName }}'
 
-  - stage: compliance
-    condition: ne('${{ parameters.compliance }}', 'disabled')
-    dependsOn: plan
-    displayName: 'Static Code Analysis Stage'
-    jobs:
-      - job: ScanningCodes
-        displayName: 'Run Checkov'
-        steps:
-          - template: tasks/terraform-tasks-compliance.yaml
-            parameters:
-              workingDirectory: '${{ parameters.workingDirectory }}'
-
-  - stage: deploy
+  - stage: destroy
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     dependsOn: 
-      - plan
-      - compliance
-    displayName: Deploy
+      - plan-destroy
+    displayName: Destroy
     jobs:
-      - deployment: apply
+      - deployment: destroy
         environment: $(System.TeamProject)-${{ parameters.env }}
         strategy:
           runOnce:
             deploy:
               steps:
-                - template: tasks/terraform-tasks-apply.yaml
+                - template: tasks/terraform-tasks-destroy.yaml
                   parameters:
                     workingDirectory: '${{ parameters.workingDirectory }}'
                     adoServiceConnectionName: '${{ parameters.adoServiceConnectionName }}'
@@ -72,3 +59,4 @@ stages:
                     backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
                     backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
                     tfvarsFileName: '${{ parameters.tfvarsFileName }}'
+
