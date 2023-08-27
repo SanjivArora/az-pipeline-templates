@@ -22,11 +22,11 @@ parameters:
   type: string
 
 stages:
-  - stage: plan-destroy
-    displayName: "Plan and Generate Artifact"
+  - stage: plan_destroy
+    displayName: "Plan output for terraform Destroy"
     jobs:
-      - job: plan-destroy 
-        displayName: Plan-destroy
+      - job: plan_destroy 
+        displayName: plan destroy
         steps:
           - template: tasks/terraform-tasks-destroy-plan.yaml
             parameters:
@@ -41,7 +41,7 @@ stages:
   - stage: destroy
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     dependsOn: 
-      - plan-destroy
+      - plan_destroy
     displayName: Destroy
     jobs:
       - deployment: destroy
