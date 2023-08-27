@@ -19,7 +19,7 @@ steps:
     displayName: 'Terraform Install'
     inputs:
       terraformVersion: '$(terraform_version)'
-  - task: TerraformTaskV2@2
+  - task: TerraformTaskV4@4
     displayName: 'Terraform Destroy'
     inputs:
       provider: 'azurerm'
