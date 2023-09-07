@@ -58,6 +58,7 @@ stages:
     displayName: Deploy
     jobs:
       - deployment: apply
+        timeoutInMinutes: 120
         environment: $(System.TeamProject)-${{ parameters.env }}
         strategy:
           runOnce:
