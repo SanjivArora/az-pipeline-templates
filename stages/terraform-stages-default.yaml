@@ -51,7 +51,8 @@ stages:
               workingDirectory: '${{ parameters.workingDirectory }}'
 
   - stage: deploy
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')))
+
     dependsOn: 
       - plan
       - compliance
