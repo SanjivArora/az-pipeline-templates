@@ -1,0 +1,11 @@
+ServerName=VPRT1HLC001
+ServerDescription=Labs NSS HL7 Client PROD
+ServerVLAN=hA-PRT-SVR-1-LABS-2227
+ServerIPAddress=10.136.96.55
+ServerDNS1=10.136.0.11
+ServerDNS2=10.136.0.25
+ServerDNS3=10.140.0.25
+Domain=Healthcare
+T1Admin=Svc_DomainODjoin
+ComputerOU=Northern Region/Production/Servers/Applications/PRT
+Prod=1
