@@ -38,6 +38,8 @@ steps:
     displayName: 'Getting SPN Credentials'
     inputs:
       addSpnToEnvironment: true
+      azureSubscription: '${{ parameters.adoServiceConnectionName }}'
+      scriptType: bash
       # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
       # TF_VAR_domain_account_password: $(domain_account_password)
     env:
