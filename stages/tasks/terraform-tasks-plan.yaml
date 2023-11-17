@@ -34,12 +34,14 @@ steps:
       backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
       backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
       backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-  # - task: AzureCLI@2
-  #   displayName: 'Linking Library Variables to TF'
-  #   env:
-  #     TF_VAR_vm_local_admin_password: $(vm_local_admin_password)
-  #     TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
-  #     TF_VAR_domain_account_password: $(domain_account_password) 
+  - task: AzureCLI@2
+    displayName: 'Getting SPN Credentials'
+    inputs:
+      addSpnToEnvironment: true
+      # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
+      # TF_VAR_domain_account_password: $(domain_account_password)
+    env:
+      TF_VAR_pipeline_spn_secret: $(servicePrincipalKey)
   - task: TerraformTaskV4@4
     displayName: 'Terraform Validate'
     inputs:
