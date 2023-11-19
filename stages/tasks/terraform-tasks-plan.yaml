@@ -43,12 +43,10 @@ steps:
       scriptLocation: inlineScript
       inlineScript: |
         # Adds Service Connection Creds to TF Vars to use
-        export ARM_SPN_CLIENT_ID=$servicePrincipalId
-        export ARM_SPN_CLIENT_SECRET=$servicePrincipalKey
+        echo "##vso[task.setvariable variable=spnClientId;isOutput=true]$servicePrincipalId"
+        echo "##vso[task.setvariable variable=spnClientSecret;isOutput=true]$servicePrincipalSecret"
       # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
       # TF_VAR_domain_account_password: $(domain_account_password)
-    env:
-      TF_VAR_pipeline_spn_secret: $(servicePrincipalKey)
   - task: TerraformTaskV4@4
     displayName: 'Terraform Validate'
     inputs:
@@ -65,7 +63,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -var spn_client_id=${ARM_SPN_CLIENT_ID} -var spn_client_secret=${ARM_SPN_CLIENT_SECRET} -out $(Build.BuildId).tfplan'
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -var spn_client_id=$(spnClientId) -var spn_client_secret=$(spnClientSecret) -out $(Build.BuildId).tfplan'
       workingDirectory: '${{ parameters.workingDirectory }}'
       environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'
       backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
