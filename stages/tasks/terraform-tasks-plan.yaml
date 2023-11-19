@@ -63,7 +63,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -var spn_client_id=$(spnClientId) -var spn_client_secret=$(spnClientSecret) -out $(Build.BuildId).tfplan'
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -var spn_client_id=$(spnClientId) -var spn_client_secret=$(Build.BuildId) -out $(Build.BuildId).tfplan'
       workingDirectory: '${{ parameters.workingDirectory }}'
       environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'
       backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
