@@ -42,7 +42,9 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        echo "secret passed"
+        # Adds Service Connection Creds to TF Vars to use
+        export ARM_SPN_CLIENT_ID=$servicePrincipalId
+        export ARM_SPN_CLIENT_SECRET=$servicePrincipalKey
       # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
       # TF_VAR_domain_account_password: $(domain_account_password)
     env:
@@ -63,7 +65,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -out $(Build.BuildId).tfplan'
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -var spn_client_id=${ARM_SPN_CLIENT_ID} -var spn_client_secret=${ARM_SPN_CLIENT_SECRET} -out $(Build.BuildId).tfplan'
       workingDirectory: '${{ parameters.workingDirectory }}'
       environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'
       backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
