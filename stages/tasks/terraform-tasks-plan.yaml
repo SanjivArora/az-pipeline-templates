@@ -47,6 +47,10 @@ steps:
         echo "##vso[task.setvariable variable=spnClientSecret;isOutput=true]$servicePrincipalSecret"
       # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
       # TF_VAR_domain_account_password: $(domain_account_password)
+  - script: |
+      echo "spnClientId: $(spnClientId)"
+    displayName: 'Echo SPN Client ID'
+    
   - task: TerraformTaskV4@4
     displayName: 'Terraform Validate'
     inputs:
