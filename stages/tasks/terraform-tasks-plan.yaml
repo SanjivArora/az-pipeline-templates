@@ -34,23 +34,20 @@ steps:
       backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
       backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
       backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-  - task: AzureCLI@2
-    displayName: 'Getting SPN Credentials'
-    inputs:
-      addSpnToEnvironment: true
-      azureSubscription: '${{ parameters.adoServiceConnectionName }}'
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        # Adds Service Connection Creds to TF Vars to use
-        echo "##vso[task.setvariable variable=spnClientId;isOutput=true]$servicePrincipalId"
-        echo "##vso[task.setvariable variable=spnClientSecret;isOutput=true]$servicePrincipalSecret"
-      # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
-      # TF_VAR_domain_account_password: $(domain_account_password)
-  - script: |
-      echo "spnClientId: $(spnClientId)"
-    displayName: 'Echo SPN Client ID'
-    
+  # - task: AzureCLI@2
+  #   displayName: 'Getting SPN Credentials'
+  #   inputs:
+  #     addSpnToEnvironment: true
+  #     azureSubscription: '${{ parameters.adoServiceConnectionName }}'
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |
+  #       # Adds Service Connection Creds to TF Vars to use
+  #       echo "##vso[task.setvariable variable=spnClientId;isOutput=true]$servicePrincipalId"
+  #       echo "##vso[task.setvariable variable=spnClientSecret;isOutput=true]$servicePrincipalSecret"
+  #     # TF_VAR_vm_local_admin_user: $(vm_local_admin_user)
+  #     # TF_VAR_domain_account_password: $(domain_account_password)
+
   - task: TerraformTaskV4@4
     displayName: 'Terraform Validate'
     inputs:
@@ -67,7 +64,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'plan'
-      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -var spn_client_id=$(spnClientId) -var spn_client_secret=$(Build.BuildId) -out $(Build.BuildId).tfplan'
+      commandOptions: '-var-file "${{ parameters.tfvarsFileName }}" -out $(Build.BuildId).tfplan'
       workingDirectory: '${{ parameters.workingDirectory }}'
       environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'
       backendAzureRmResourceGroupName: '${{ parameters.backendAzureRmResourceGroupName }}'
