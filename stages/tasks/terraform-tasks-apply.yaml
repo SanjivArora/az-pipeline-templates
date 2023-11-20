@@ -50,3 +50,5 @@ steps:
       commandOptions: '-var-file "${{ parameters.tfvarsFileName }}"'
       workingDirectory: '${{ parameters.workingDirectory }}'
       environmentServiceNameAzureRM: '${{ parameters.adoServiceConnectionName }}'
+    env:
+      TF_VAR_spn_object_id: $(spn_object_id)
