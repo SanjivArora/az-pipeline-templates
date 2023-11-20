@@ -34,6 +34,8 @@ steps:
       backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
       backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
       backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+    env:
+      TF_VAR_spn_object_id: $(spn_object_id)
   # - task: AzureCLI@2
   #   displayName: 'Getting SPN Credentials'
   #   inputs:
