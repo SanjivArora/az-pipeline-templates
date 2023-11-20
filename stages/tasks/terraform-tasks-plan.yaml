@@ -34,8 +34,6 @@ steps:
       backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
       backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
       backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
-    env:
-      TF_VAR_spn_object_id: $(spn_object_id)
   # - task: AzureCLI@2
   #   displayName: 'Getting SPN Credentials'
   #   inputs:
@@ -73,6 +71,8 @@ steps:
       backendAzureRmStorageAccountName: '${{ parameters.backendAzureRmStorageAccountName }}'
       backendAzureRmContainerName: '${{ parameters.backendAzureRmContainerName }}'
       backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
+    env:
+      TF_VAR_spn_object_id: $(spn_object_id)
   - task: ArchiveFiles@2
     displayName: 'Archive Terraform Plan Files'
     inputs:
