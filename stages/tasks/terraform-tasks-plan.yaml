@@ -73,6 +73,7 @@ steps:
       backendAzureRmKey: '${{ parameters.backendAzureRmKey }}'
     env:
       TF_VAR_spn_object_id: $(spn_object_id)
+      TF_VAR_service_principal_secret: $(service_principal_secret)
   - task: ArchiveFiles@2
     displayName: 'Archive Terraform Plan Files'
     inputs:
